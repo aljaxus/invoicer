@@ -11,7 +11,23 @@
                   <table>
                     <tr>
                       <td class="title">
-                        <img src="./assets/spintec-logo-cropped.svg" style="width:100%; max-width:300px;">
+                        <input
+                          ref="logoInput"
+                          type="file"
+                          style="display: none"
+                          accept="image/*"
+                          @change="onLogoPicked"
+                        >
+                        <img 
+                          :src="logoSrc" 
+                          alt="Company logo"
+                          style="
+                            width:100%;
+                            max-width:300px;
+                            cursor:pointer;
+                          "
+                          @click.stop="$refs.logoInput.click()"
+                        >
                       </td>
                       <td>
                         <v-dialog
@@ -23,7 +39,18 @@
                           width="290px"
                         >
                           <template v-slot:activator="{ on }">
-                            <span v-on="on" class="pointer" :style="generating_pdf_index===0?'color:#2196f3;':''">Created: {{ date_created }}</span>
+                            <span class="pointer" :style="generating_pdf_index===0?'color:#2196f3;':''">  
+                              <v-edit-dialog :return-value.sync="textCreate">
+                                {{ textCreate }}: <span @click.stop="" v-on="on">{{ date_created }}</span>
+                                <template v-slot:input>
+                                  <v-text-field
+                                    v-model="textCreate"
+                                    label="Edit"
+                                    single-line
+                                  ></v-text-field>
+                                </template>
+                              </v-edit-dialog>
+                            </span>
                           </template>
                           <v-date-picker 
                             v-model="date_created_tmp" 
@@ -45,7 +72,18 @@
                           width="290px"
                         >
                           <template v-slot:activator="{ on }">
-                            <span v-on="on" class="pointer" :style="generating_pdf_index===0?'color:#2196f3;':''">Due: {{ date_due }}</span>
+                            <span class="pointer" :style="generating_pdf_index===0?'color:#2196f3;':''">
+                              <v-edit-dialog :return-value.sync="textDue">
+                                {{ textDue }}: <span @click.stop="" v-on="on">{{ date_due }}</span>
+                                <template v-slot:input>
+                                  <v-text-field
+                                    v-model="textDue"
+                                    label="Edit"
+                                    single-line
+                                  ></v-text-field>
+                                </template>
+                              </v-edit-dialog>
+                            </span>
                           </template>
                           <v-date-picker 
                             v-model="date_due_tmp"
@@ -67,12 +105,6 @@
                 <td colspan="2">
                   <table>
                     <tr>
-                      <td>
-                        SPINTEC d.o.o.<br>
-                        Polje 12<br>
-                        5290 Šempeter pri Gorici<br>
-                        Slovenija
-                      </td>
                       <td>
                         <span
                           v-for="(line, i) in lines1"
@@ -103,8 +135,44 @@
                           right small icon 
                           color="success"
                           class="c_btnmicro"
-                          style="float: right;"
+                          style="float: left;"
                           @click="lines1.push('New line')" 
+                        >
+                          <v-icon>mdi-plus</v-icon>
+                        </v-btn>
+                      </td>
+                      <td>
+                        <span
+                          v-for="(line, i) in lines2"
+                          :key="i"
+                        >
+                          <v-edit-dialog :return-value.sync="lines2[i]">
+                            {{ line }}
+                            <v-btn 
+                              v-if="generating_pdf_index === 0"
+                              small icon 
+                              color="error"
+                              class="c_btnmicro"
+                              @click.stop="lines2.splice(i, 1)" 
+                            >
+                              <v-icon>mdi-minus</v-icon>
+                            </v-btn>
+                            <template v-slot:input>
+                              <v-text-field
+                                v-model="lines2[i]"
+                                label="Edit"
+                                single-line
+                              ></v-text-field>
+                            </template>
+                          </v-edit-dialog>
+                        </span>
+                        <v-btn 
+                          v-if="lines2.length < 6 && generating_pdf_index === 0"
+                          right small icon 
+                          color="success"
+                          class="c_btnmicro"
+                          style="float: right;"
+                          @click="lines2.push('New line')" 
                         >
                           <v-icon>mdi-plus</v-icon>
                         </v-btn>
@@ -114,8 +182,30 @@
                 </td>
               </tr>
               <tr class="heading">
-                <td>Product</td>
-                <td>Price</td>
+                <td>
+                  <v-edit-dialog :return-value.sync="textProduct">
+                    {{ textProduct }}
+                    <template v-slot:input>
+                      <v-text-field
+                        v-model="textProduct"
+                        label="Edit"
+                        single-line
+                      ></v-text-field>
+                    </template>
+                  </v-edit-dialog>
+                </td>
+                <td>
+                  <v-edit-dialog :return-value.sync="textPrice">
+                    {{ textPrice }}
+                    <template v-slot:input>
+                      <v-text-field
+                        v-model="textPrice"
+                        label="Edit"
+                        single-line
+                      ></v-text-field>
+                    </template>
+                  </v-edit-dialog>
+                </td>
               </tr>
               <tr
                 v-for="(item, i) in items"
@@ -174,7 +264,17 @@
               <tr class="total">
                 <td></td>
                 <td>
-                  Total price: €{{ costs_total }}
+
+                  <v-edit-dialog :return-value.sync="textTotalPrice">
+                    {{ textTotalPrice }} {{ costs_total }}
+                    <template v-slot:input>
+                      <v-text-field
+                        v-model="textTotalPrice"
+                        label="Edit"
+                        single-line
+                      ></v-text-field>
+                    </template>
+                  </v-edit-dialog>
                 </td>
               </tr>
             </table>
@@ -209,6 +309,7 @@
 import JsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
 import { json2excel } from 'js2excel'
+import Image from './modules/image'
 
 export default {
   name: 'App',
@@ -218,6 +319,16 @@ export default {
     invoice_id: 0,
     items: [],
     lines1: [],
+    lines2: [],
+    textDue: 'Due',
+    textCreate: 'Created',
+    textPrice: 'Price',
+    textProduct: 'Product',
+    textTotalPrice: 'Total price: €',
+    logoSrc: '/img/iconfinder-icon(3).svg',
+    logoFile: null,
+    logoName: '',
+    logoLoading: false,
     date_created: new Date().toISOString().substr(0, 10),
     date_created_picker: false,
     date_created_tmp: new Date().toISOString().substr(0, 10),
@@ -283,6 +394,28 @@ export default {
           setTimeout(() => this.generating_pdf_index = 0, 2500);
         })
       }, 10)
+    },
+    onLogoPicked (e) {
+      const files = e.target.files
+
+      if (files[0] !== undefined && files[0] !== 'undefined') {
+        this.logoName = files[0].name
+        if (this.logoName.lastIndexOf('.') <= 0) return
+
+        const fr = new FileReader()
+
+        fr.readAsDataURL(files[0])
+        fr.addEventListener('load', async () => {
+          this.logoSrc = await Image.resizeBase64(fr.result, 512, 512)
+          this.logoFile = files[0]
+        })
+      } else {
+        this.logoSrc = '/img/stransparent.svg'
+        this.logoFile = null
+        this.logoName = 'Transparent.svg'
+      }
+
+      e.target.value = ''
     }
   }
 }
