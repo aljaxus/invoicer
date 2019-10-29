@@ -21,13 +21,13 @@ const func = {
           canvas.width = iwScaled
           canvas.height = ihScaled
           ctx.drawImage(img, 0, 0, iwScaled, ihScaled)
-    
+
           const base64url = canvas.toDataURL()
           resolve(base64url)
         }
       } catch (error) { reject(error) }
     })
-  },
+  }
 }
 
 module.exports = func
