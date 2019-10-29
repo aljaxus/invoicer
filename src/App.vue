@@ -106,76 +106,84 @@
                   <table>
                     <tr>
                       <td>
-                        <span
-                          v-for="(line, i) in lines1"
-                          :key="i"
-                        >
-                          <v-edit-dialog :return-value.sync="lines1[i]">
-                            {{ line }}
+                        <ul style="list-style:none;">
+                          <li
+                            v-for="(line, i) in lines1"
+                            :key="i"
+                          >
+                            <v-edit-dialog :return-value.sync="lines1[i]">
+                              {{ line }}
+                              <v-btn 
+                                v-if="generating_pdf_index === 0"
+                                small icon 
+                                color="error"
+                                class="c_btnmicro"
+                                @click.stop="lines1.splice(i, 1)" 
+                              >
+                                <v-icon>mdi-minus</v-icon>
+                              </v-btn>
+                              <template v-slot:input>
+                                <v-text-field
+                                  v-model="lines1[i]"
+                                  label="Edit"
+                                  single-line
+                                ></v-text-field>
+                              </template>
+                            </v-edit-dialog>
+                          </li>
+                          <li>
                             <v-btn 
-                              v-if="generating_pdf_index === 0"
-                              small icon 
-                              color="error"
+                              v-if="lines1.length < 6 && generating_pdf_index === 0"
+                              right small icon 
+                              color="success"
                               class="c_btnmicro"
-                              @click.stop="lines1.splice(i, 1)" 
+                              style="float: left;"
+                              @click="lines1.push('New line')" 
                             >
-                              <v-icon>mdi-minus</v-icon>
+                              <v-icon>mdi-plus</v-icon>
                             </v-btn>
-                            <template v-slot:input>
-                              <v-text-field
-                                v-model="lines1[i]"
-                                label="Edit"
-                                single-line
-                              ></v-text-field>
-                            </template>
-                          </v-edit-dialog>
-                        </span>
-                        <v-btn 
-                          v-if="lines1.length < 6 && generating_pdf_index === 0"
-                          right small icon 
-                          color="success"
-                          class="c_btnmicro"
-                          style="float: left;"
-                          @click="lines1.push('New line')" 
-                        >
-                          <v-icon>mdi-plus</v-icon>
-                        </v-btn>
+                          </li>
+                        </ul>
                       </td>
                       <td>
-                        <span
-                          v-for="(line, i) in lines2"
-                          :key="i"
-                        >
-                          <v-edit-dialog :return-value.sync="lines2[i]">
-                            {{ line }}
+                        <ul style="list-style:none;">
+                          <li
+                            v-for="(line, i) in lines2"
+                            :key="i"
+                          >
+                            <v-edit-dialog :return-value.sync="lines2[i]">
+                              {{ line }}
+                              <v-btn 
+                                v-if="generating_pdf_index === 0"
+                                small icon 
+                                color="error"
+                                class="c_btnmicro"
+                                @click.stop="lines2.splice(i, 1)" 
+                              >
+                                <v-icon>mdi-minus</v-icon>
+                              </v-btn>
+                              <template v-slot:input>
+                                <v-text-field
+                                  v-model="lines2[i]"
+                                  label="Edit"
+                                  single-line
+                                ></v-text-field>
+                              </template>
+                            </v-edit-dialog>
+                          </li>
+                          <li>
                             <v-btn 
-                              v-if="generating_pdf_index === 0"
-                              small icon 
-                              color="error"
+                              v-if="lines2.length < 6 && generating_pdf_index === 0"
+                              right small icon 
+                              color="success"
                               class="c_btnmicro"
-                              @click.stop="lines2.splice(i, 1)" 
+                              style="float: right;"
+                              @click="lines2.push('New line')" 
                             >
-                              <v-icon>mdi-minus</v-icon>
+                              <v-icon>mdi-plus</v-icon>
                             </v-btn>
-                            <template v-slot:input>
-                              <v-text-field
-                                v-model="lines2[i]"
-                                label="Edit"
-                                single-line
-                              ></v-text-field>
-                            </template>
-                          </v-edit-dialog>
-                        </span>
-                        <v-btn 
-                          v-if="lines2.length < 6 && generating_pdf_index === 0"
-                          right small icon 
-                          color="success"
-                          class="c_btnmicro"
-                          style="float: right;"
-                          @click="lines2.push('New line')" 
-                        >
-                          <v-icon>mdi-plus</v-icon>
-                        </v-btn>
+                          </li>
+                        </ul>
                       </td>
                     </tr>
                   </table>
